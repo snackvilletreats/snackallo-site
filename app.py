@@ -3,11 +3,12 @@ from flask import Flask, render_template, request, redirect, url_for, session
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
 
-# Dummy product data
 products = [
     {"id": 1, "name": "Banana Chips", "price": 100, "image": "banana-chips.jpg"},
     {"id": 2, "name": "Mixture", "price": 80, "image": "mixture.jpg"},
-    {"id": 3, "name": "Achappam", "price": 120, "image": "achappam.jpg"}
+    {"id": 3, "name": "Achappam", "price": 120, "image": "achappam.jpg"},
+    {"id": 4, "name": "Mota Sev", "price": 90, "image": "mota-sev.jpg"},
+    {"id": 5, "name": "Coconut Balls", "price": 150, "image": "coconut-balls.jpg"}
 ]
 
 def find_product(product_id):
@@ -15,11 +16,23 @@ def find_product(product_id):
 
 @app.route('/')
 def home():
-    return render_template('index.html', products=products)
+    return render_template('index.html')
 
 @app.route('/shop')
 def shop():
     return render_template('shop.html', products=products)
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')
+
+@app.route('/faq')
+def faq():
+    return render_template('faq.html')
 
 @app.route('/cart')
 def cart():
@@ -28,21 +41,26 @@ def cart():
 
 @app.route('/add_to_cart', methods=['POST'])
 def add_to_cart():
-    product_id = int(request.form['product_id'])
-    quantity = int(request.form.get('quantity', 1))
+    try:
+        product_id = int(request.form['product_id'])
+        quantity = int(request.form.get('quantity', 1))
+        if quantity < 1:
+            quantity = 1
+    except (ValueError, KeyError):
+        return redirect(url_for('shop'))
+
     product = find_product(product_id)
     if not product:
         return redirect(url_for('shop'))
-    
+
     cart = session.get('cart', [])
-    
-    # Check if product already in cart
+
+    # Check if product already in cart, update quantity
     for item in cart:
         if item['id'] == product_id:
             item['quantity'] += quantity
             break
     else:
-        # Add new item with quantity
         cart.append({
             'id': product['id'],
             'name': product['name'],
