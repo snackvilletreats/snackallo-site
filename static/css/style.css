@@ -1,0 +1,13 @@
+body {
+  background-color: #fffbe9;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar-brand img {
+  max-height: 50px;
+}
+
+.card-img-top {
+  object-fit: cover;
+  height: 200px;
+}
