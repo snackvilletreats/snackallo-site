@@ -120,7 +120,7 @@ def checkout():
         "payment_capture": '1'
     })
     session['cart'] = {}  # Clear cart after creating order
-    content=f"""
+    content = f"""
     <h2>Payment Initiated</h2>
     <p>Order ID: {order['id']}</p>
     <script src='https://checkout.razorpay.com/v1/checkout.js'></script>
@@ -138,7 +138,8 @@ def checkout():
       ></script>
     </form>
     """
-   return render_page('Checkout - Snackallo',content)                   
+    return render_page('Checkout - Snackallo', content)
+
 @app.route('/about')
 def about():
     content = """
