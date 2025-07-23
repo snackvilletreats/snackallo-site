@@ -7,12 +7,10 @@ products = [
     {"id": 1, "name": "Banana Chips", "price": 100, "image": "banana-chips.jpg"},
     {"id": 2, "name": "Mixture", "price": 80, "image": "mixture.jpg"},
     {"id": 3, "name": "Achappam", "price": 120, "image": "achappam.jpg"},
-    {"id": 4, "name": "Mota Sev", "price": 90, "image": "mota-sev.jpg"},
-    {"id": 5, "name": "Coconut Balls", "price": 150, "image": "coconut-balls.jpg"}
 ]
 
 def find_product(product_id):
-    return next((p for p in products if p["id"] == product_id), None)
+    return next((p for p in products if p['id'] == product_id), None)
 
 @app.route('/')
 def home():
@@ -21,18 +19,6 @@ def home():
 @app.route('/shop')
 def shop():
     return render_template('shop.html', products=products)
-
-@app.route('/about')
-def about():
-    return render_template('about.html')
-
-@app.route('/contact')
-def contact():
-    return render_template('contact.html')
-
-@app.route('/faq')
-def faq():
-    return render_template('faq.html')
 
 @app.route('/cart')
 def cart():
@@ -55,7 +41,7 @@ def add_to_cart():
 
     cart = session.get('cart', [])
 
-    # Check if product already in cart, update quantity
+    # Update quantity if product exists
     for item in cart:
         if item['id'] == product_id:
             item['quantity'] += quantity
@@ -67,6 +53,7 @@ def add_to_cart():
             'price': product['price'],
             'quantity': quantity
         })
+
     session['cart'] = cart
     return redirect(url_for('cart'))
 
