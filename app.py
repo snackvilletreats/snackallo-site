@@ -28,7 +28,7 @@ base_template = """
     </nav>
   </header>
   <main>
-    {{ content }}
+    {{ content | safe }}
   </main>
   <footer>
     <p>&copy; 2025 Snackville Treats LLP | snackallo.com</p>
