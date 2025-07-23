@@ -1,1 +1,0 @@
-{% for item in cart %}<div><p>{{ item.name }} - ₹{{ item.price }}</p><form method='post' action='/remove-from-cart'><input type='hidden' name='index' value='{{ loop.index0 }}'><button type='submit'>Remove</button></form></div>{% endfor %}<form method='post' action='/checkout'><button type='submit'>Pay Now</button></form>
