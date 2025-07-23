@@ -1,1 +1,21 @@
-<h1>Thank You!</h1><p>Your order has been placed.</p>
+<!-- templates/thankyou.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Order Confirmation - Snackallo</title>
+</head>
+<body>
+  <h1>Thank You for Your Order!</h1>
+  <p>Your order has been placed successfully.</p>
+
+  <h3>Order Summary:</h3>
+  <ul>
+    {% for item in cart %}
+      <li>{{ item.quantity }} x {{ item.name }} - ₹{{ item.quantity * item.price }}</li>
+    {% endfor %}
+  </ul>
+
+  <a href="{{ url_for('shop') }}">Back to Shop</a>
+</body>
+</html>
