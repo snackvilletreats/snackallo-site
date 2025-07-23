@@ -1,0 +1,20 @@
+
+---
+
+### Sample render.yaml for Flask app:
+
+```yaml
+services:
+  - type: web
+    name: snackallo-web
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app.py
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: RAZORPAY_KEY_ID
+        fromSecret: razorpay_key_id
+      - key: RAZORPAY_KEY_SECRET
+        fromSecret: razorpay_key_secret
