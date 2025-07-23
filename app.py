@@ -32,64 +32,52 @@ def faq():
 
 @app.route('/cart')
 def cart():
-    cart = session.get('cart', [])
-    return render_template('cart.html', cart=cart)
+    cart = session.get('cart', {})
+    total = sum(item['price'] * item['quantity'] for item in cart.values())
+    return render_template('cart.html', cart=cart, total=total)
 
-@app.route('/add-to-cart/<int:product_id>')
+@app.route('/add-to-cart/<int:product_id>', methods=['POST'])
 def add_to_cart(product_id):
-    cart = session.get('cart', [])
-    found = False
+    quantity = int(request.form.get('quantity', 1))
+    cart = session.get('cart', {})
 
-    for item in cart:
-        if item["id"] == product_id:
-            item["quantity"] += 1
-            found = True
-            break
-
-    if not found:
-        product = next((p for p in products if p["id"] == product_id), None)
+    if str(product_id) in cart:
+        cart[str(product_id)]['quantity'] += quantity
+    else:
+        product = next((p for p in products if p['id'] == product_id), None)
         if product:
-            cart.append({
-                "id": product["id"],
-                "name": product["name"],
-                "price": product["price"],
-                "quantity": 1
-            })
-
+            cart[str(product_id)] = {
+                "id": product['id'],
+                "name": product['name'],
+                "price": product['price'],
+                "quantity": quantity
+            }
     session['cart'] = cart
     return redirect(url_for('cart'))
 
-@app.route('/update-cart', methods=['POST'])
-def update_cart():
-    product_ids = request.form.getlist('product_ids')
-    quantities = request.form.getlist('quantities')
-    remove_ids = request.form.getlist('remove')
+@app.route('/remove-from-cart/<int:product_id>', methods=['POST'])
+def remove_from_cart(product_id):
+    cart = session.get('cart', {})
+    if str(product_id) in cart:
+        del cart[str(product_id)]
+    session['cart'] = cart
+    return redirect(url_for('cart'))
 
-    updated_cart = []
-
-    for i in range(len(product_ids)):
-        product_id = int(product_ids[i])
-        quantity = int(quantities[i])
-
-        if str(product_id) in remove_ids:
-            continue  # Skip this item if marked for removal
-
-        for product in products:
-            if product["id"] == product_id:
-                updated_cart.append({
-                    "id": product["id"],
-                    "name": product["name"],
-                    "price": product["price"],
-                    "quantity": quantity
-                })
-                break
-
-    session['cart'] = updated_cart
+@app.route('/update-cart/<int:product_id>', methods=['POST'])
+def update_cart(product_id):
+    cart = session.get('cart', {})
+    quantity = int(request.form.get('quantity', 1))
+    if str(product_id) in cart:
+        if quantity > 0:
+            cart[str(product_id)]['quantity'] = quantity
+        else:
+            del cart[str(product_id)]
+    session['cart'] = cart
     return redirect(url_for('cart'))
 
 @app.route('/checkout', methods=['POST'])
 def checkout():
-    cart = session.get('cart', [])
+    cart = session.get('cart', {})
     session.pop('cart', None)
     return render_template('thankyou.html', cart=cart)
 
