@@ -4,6 +4,7 @@ import razorpay
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
+# Replace these with your actual Razorpay credentials
 razorpay_client = razorpay.Client(auth=("YOUR_RAZORPAY_KEY_ID", "YOUR_RAZORPAY_KEY_SECRET"))
 
 base_template = """
@@ -17,7 +18,8 @@ base_template = """
 </head>
 <body>
   <header>
-    <h1>Snackallo</h1>
+    <img src='/static/images/snackallo-logo.png' alt='Snackallo Logo' style='height:60px; vertical-align: middle;'>
+    <h1 style='display:inline; margin-left:10px;'>Snackallo</h1>
     <nav>
       <a href='/'>Home</a>
       <a href='/shop'>Shop</a>
@@ -91,6 +93,14 @@ def add_to_cart():
     session.modified = True
     return redirect(url_for('cart'))
 
+@app.route('/remove-from-cart', methods=['POST'])
+def remove_from_cart():
+    pid = request.form['product_id']
+    if pid in session['cart']:
+        session['cart'].pop(pid)
+        session.modified = True
+    return redirect(url_for('cart'))
+
 @app.route('/cart')
 def cart():
     items = ""
@@ -99,46 +109,57 @@ def cart():
         p = products[pid]
         subtotal = p['price'] * qty
         total += subtotal
-        items += f"<li>{p['name']} x {qty} = ₹{subtotal}</li>"
+        items += f"""
+        <li>
+          <img src='/static/images/{p['img']}' alt='{p['name']}' class='cart-img'>
+          {p['name']} x {qty} = ₹{subtotal}
+          <form action='/remove-from-cart' method='POST' style='display:inline; margin-left:10px;'>
+            <input type='hidden' name='product_id' value='{pid}'>
+            <button type='submit' class='remove-btn'>Remove</button>
+          </form>
+        </li>
+        """
     content = f"""
     <h2>Your Shopping Cart</h2>
     <ul>{items or '<li>Your cart is empty.</li>'}</ul>
     <h3>Total: ₹{total}</h3>
-    <form action='/checkout' method='POST'>
+    {"<form action='/checkout' method='POST'>" if total > 0 else ""}
       <input type='hidden' name='amount' value='{total * 100}'>
-      <button type='submit' class='btn'>Pay Now</button>
-    </form>
+      <button type='submit' class='btn' {'disabled' if total == 0 else ''}>Pay Now</button>
+    {"</form>" if total > 0 else ""}
     """
     return render_page('Cart - Snackallo', content)
 
 @app.route('/checkout', methods=['POST'])
 def checkout():
     amount = int(request.form['amount'])
-    order = razorpay_client.order.create({
-        "amount": amount,
-        "currency": "INR",
-        "payment_capture": '1'
-    })
-    session['cart'] = {}
-    content = f"""
-    <h2>Payment Initiated</h2>
-    <p>Order ID: {order['id']}</p>
-    <script src='https://checkout.razorpay.com/v1/checkout.js'></script>
-    <form>
-      <script
-        src='https://checkout.razorpay.com/v1/checkout.js'
-        data-key='YOUR_RAZORPAY_KEY_ID'
-        data-amount='{amount}'
-        data-currency='INR'
-        data-order_id='{order['id']}'
-        data-buttontext='Pay with Razorpay'
-        data-name='Snackallo'
-        data-description='Snack Purchase'
-        data-theme.color='#F37254'
-      ></script>
-    </form>
-    """
-    return render_page('Checkout - Snackallo', content)
+    try:
+        order = razorpay_client.order.create({
+            "amount": amount,
+            "currency": "INR",
+            "payment_capture": '1'
+        })
+        session['cart'] = {}
+        content = f"""
+        <h2>Payment Initiated</h2>
+        <p>Order ID: {order['id']}</p>
+        <form>
+          <script
+            src='https://checkout.razorpay.com/v1/checkout.js'
+            data-key='YOUR_RAZORPAY_KEY_ID'
+            data-amount='{amount}'
+            data-currency='INR'
+            data-order_id='{order['id']}'
+            data-buttontext='Pay with Razorpay'
+            data-name='Snackallo'
+            data-description='Snack Purchase'
+            data-theme.color='#F37254'
+          ></script>
+        </form>
+        """
+        return render_page('Checkout - Snackallo', content)
+    except Exception as e:
+        return render_page('Payment Error', f"<h2>Payment Error</h2><p>{str(e)}</p>")
 
 @app.route('/about')
 def about():
@@ -158,8 +179,8 @@ def about():
 def contact():
     content = """
     <h2>Contact Us</h2>
-    <p>Phone: +91-XXXXXXXXXX</p>
-    <p>Email: support@snackallo.com</p>
+    <p>Phone: +91-7736 944 344</p>
+    <p>Email: care@snackallo.com</p>
     <form>
       <input type='text' placeholder='Your Name'><br>
       <input type='email' placeholder='Your Email'><br>
