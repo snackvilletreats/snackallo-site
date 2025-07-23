@@ -146,9 +146,9 @@ def about():
     <p>Snackville Treats LLP, established in 2024, brings the flavors of Kerala to every corner of India. Under the brand Snackallo, we handcraft banana chips and traditional snacks with the highest quality standards.</p>
     <h3>Our Founders</h3>
     <ul>
-      <li>Mohammed Shanib – CEO</li>
-      <li>Abdul Vajid SVP – Designated Partner</li>
-      <li>Fayaz KV – Managing Director</li>
+      <li>Mohammed Shanib - CEO</li>
+      <li>Abdul Vajid SVP - Designated Partner</li>
+      <li>Fayaz KV - Managing Director</li>
     </ul>
     """
     return render_page('About Us - Snackallo', content)
