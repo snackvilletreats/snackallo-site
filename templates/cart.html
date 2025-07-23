@@ -1,51 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Shopping Cart</title>
+    <meta charset="UTF-8" />
+    <title>Cart - Snackallo</title>
 </head>
 <body>
-  <h1>Your Cart</h1>
-  {% if cart %}
-  <table border="1" cellpadding="5" cellspacing="0">
-    <thead>
-      <tr>
-        <th>Item</th>
-        <th>Price (₹)</th>
-        <th>Quantity</th>
-        <th>Total (₹)</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for product_id, item in cart.items() %}
-      <tr>
-        <td>{{ item.name }}</td>
-        <td>{{ item.price }}</td>
-        <td>
-          <form action="{{ url_for('update_cart', product_id=product_id) }}" method="post" style="display:inline;">
-            <input type="number" name="quantity" min="0" value="{{ item.quantity }}" style="width:50px;" />
-            <button type="submit">Update</button>
-          </form>
-        </td>
-        <td>{{ item.price * item.quantity }}</td>
-        <td>
-          <form action="{{ url_for('remove_from_cart', product_id=product_id) }}" method="post" style="display:inline;">
-            <button type="submit">Remove</button>
-          </form>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-
-  <h3>Total: ₹{{ total }}</h3>
-
-  <form action="{{ url_for('checkout') }}" method="post">
-    <button type="submit">Pay Now</button>
-  </form>
-  {% else %}
-  <p>Your cart is empty.</p>
-  {% endif %}
+    <h1>Your Cart</h1>
+    {% if cart %}
+    <table border="1" cellpadding="10" cellspacing="0">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Price</th>
+          <th>Quantity</th>
+          <th>Total</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in cart %}
+        <tr>
+          <td>{{ item.name }}</td>
+          <td>₹{{ item.price }}</td>
+          <td>
+            <form action="{{ url_for('update_quantity') }}" method="post" style="display:inline;">
+              <input type="hidden" name="product_id" value="{{ item.id }}">
+              <input type="number" name="quantity" value="{{ item.quantity }}" min="1" style="width:50px;" required>
+              <button type="submit">Update</button>
+            </form>
+          </td>
+          <td>₹{{ item.price * item.quantity }}</td>
+          <td>
+            <form action="{{ url_for('remove_from_cart') }}" method="post" style="display:inline;">
+              <input type="hidden" name="product_id" value="{{ item.id }}">
+              <button type="submit">Remove</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p>
+      <strong>Total: ₹
+        {{ cart | sum(attribute='price', start=0) + cart | sum(attribute='quantity', start=0) }} <!-- You may want to sum total properly -->
+      </strong>
+    </p>
+    {% else %}
+    <p>Your cart is empty.</p>
+    {% endif %}
+    <p><a href="{{ url_for('shop') }}">Continue Shopping</a></p>
 </body>
 </html>
