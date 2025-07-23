@@ -1,1 +1,27 @@
-{% for p in products %}<div><img src='/static/images/{{ p.image }}'><p>{{ p.name }} - ₹{{ p.price }}</p><a href='/add-to-cart/{{ p.id }}'>Add to Cart</a></div>{% endfor %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Shop - Snackallo</title>
+</head>
+<body>
+    <h1>Shop Products</h1>
+    <ul>
+    {% for product in products %}
+      <li>
+        <img src="{{ url_for('static', filename=product.image) }}" alt="{{ product.name }}" width="100" />
+        <h3>{{ product.name }}</h3>
+        <p>Price: ₹{{ product.price }}</p>
+        <form action="{{ url_for('add_to_cart') }}" method="post">
+          <input type="hidden" name="product_id" value="{{ product.id }}">
+          <label>Quantity:
+            <input type="number" name="quantity" value="1" min="1" required style="width:50px;">
+          </label>
+          <button type="submit">Add to Cart</button>
+        </form>
+      </li>
+    {% endfor %}
+    </ul>
+    <p><a href="{{ url_for('cart') }}">View Cart</a></p>
+</body>
+</html>
