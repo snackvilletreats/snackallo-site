@@ -1,53 +1,45 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <title>Cart - Snackallo</title>
-</head>
-<body>
-    <h1>Your Cart</h1>
-    {% if cart %}
-    <table border="1" cellpadding="10" cellspacing="0">
-      <thead>
+{% extends "base.html" %}
+{% block title %}Cart{% endblock %}
+{% block content %}
+<h1>Your Cart</h1>
+{% if cart %}
+<table border="1" cellpadding="10" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+    <thead>
         <tr>
-          <th>Product</th>
-          <th>Price</th>
-          <th>Quantity</th>
-          <th>Total</th>
-          <th>Actions</th>
+            <th>Product</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Total</th>
+            <th>Actions</th>
         </tr>
-      </thead>
-      <tbody>
+    </thead>
+    <tbody>
+        {% set total = 0 %}
         {% for item in cart %}
+        {% set total = total + (item.price * item.quantity) %}
         <tr>
-          <td>{{ item.name }}</td>
-          <td>₹{{ item.price }}</td>
-          <td>
-            <form action="{{ url_for('update_quantity') }}" method="post" style="display:inline;">
-              <input type="hidden" name="product_id" value="{{ item.id }}">
-              <input type="number" name="quantity" value="{{ item.quantity }}" min="1" style="width:50px;" required>
-              <button type="submit">Update</button>
-            </form>
-          </td>
-          <td>₹{{ item.price * item.quantity }}</td>
-          <td>
-            <form action="{{ url_for('remove_from_cart') }}" method="post" style="display:inline;">
-              <input type="hidden" name="product_id" value="{{ item.id }}">
-              <button type="submit">Remove</button>
-            </form>
-          </td>
+            <td>{{ item.name }}</td>
+            <td>₹{{ item.price }}</td>
+            <td>
+                <form action="{{ url_for('update_quantity') }}" method="post" style="display:inline;">
+                    <input type="hidden" name="product_id" value="{{ item.id }}">
+                    <input type="number" name="quantity" value="{{ item.quantity }}" min="1" style="width:50px;" required>
+                    <button type="submit">Update</button>
+                </form>
+            </td>
+            <td>₹{{ item.price * item.quantity }}</td>
+            <td>
+                <form action="{{ url_for('remove_from_cart') }}" method="post" style="display:inline;">
+                    <input type="hidden" name="product_id" value="{{ item.id }}">
+                    <button type="submit">Remove</button>
+                </form>
+            </td>
         </tr>
         {% endfor %}
-      </tbody>
-    </table>
-    <p>
-      <strong>Total: ₹
-        {{ cart | sum(attribute='price', start=0) + cart | sum(attribute='quantity', start=0) }} <!-- You may want to sum total properly -->
-      </strong>
-    </p>
-    {% else %}
-    <p>Your cart is empty.</p>
-    {% endif %}
-    <p><a href="{{ url_for('shop') }}">Continue Shopping</a></p>
-</body>
-</html>
+    </tbody>
+</table>
+<p><strong>Total: ₹{{ total }}</strong></p>
+{% else %}
+<p>Your cart is empty.</p>
+{% endif %}
+{% endblock %}
