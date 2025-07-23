@@ -3,29 +3,12 @@
 <head>
     <meta charset="UTF-8" />
     <title>Snackallo - {% block title %}{% endblock %}</title>
-    <style>
-        nav a {
-            margin: 0 10px;
-            text-decoration: none;
-            color: #007bff;
-        }
-        nav a:hover {
-            text-decoration: underline;
-        }
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-    </style>
 </head>
 <body>
     <nav>
         <a href="{{ url_for('home') }}">Home</a> |
         <a href="{{ url_for('shop') }}">Shop</a> |
-        <a href="{{ url_for('cart') }}">Cart ({{ session.get('cart')|length if session.get('cart') else 0 }})</a> |
-        <a href="{{ url_for('about') }}">About</a> |
-        <a href="{{ url_for('contact') }}">Contact</a> |
-        <a href="{{ url_for('faq') }}">FAQ</a>
+        <a href="{{ url_for('cart') }}">Cart ({{ session.get('cart')|length if session.get('cart') else 0 }})</a>
     </nav>
     <hr />
     {% block content %}{% endblock %}
