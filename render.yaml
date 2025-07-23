@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: snackallo
+    runtime: python
+    buildCommand: ""
+    startCommand: gunicorn app:app
