@@ -1,27 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <title>Shop - Snackallo</title>
-</head>
-<body>
-    <h1>Shop Products</h1>
-    <ul>
+{% extends "base.html" %}
+{% block title %}Shop{% endblock %}
+{% block content %}
+<h1>Shop Snacks</h1>
+<ul style="list-style:none; padding:0;">
     {% for product in products %}
-      <li>
-        <img src="{{ url_for('static', filename=product.image) }}" alt="{{ product.name }}" width="100" />
+    <li style="margin-bottom: 20px;">
+        <img src="{{ url_for('static', filename=product.image) }}" alt="{{ product.name }}" width="120" />
         <h3>{{ product.name }}</h3>
         <p>Price: ₹{{ product.price }}</p>
         <form action="{{ url_for('add_to_cart') }}" method="post">
-          <input type="hidden" name="product_id" value="{{ product.id }}">
-          <label>Quantity:
-            <input type="number" name="quantity" value="1" min="1" required style="width:50px;">
-          </label>
-          <button type="submit">Add to Cart</button>
+            <input type="hidden" name="product_id" value="{{ product.id }}">
+            <label>Quantity:
+                <input type="number" name="quantity" value="1" min="1" style="width:50px;" required>
+            </label>
+            <button type="submit">Add to Cart</button>
         </form>
-      </li>
+    </li>
     {% endfor %}
-    </ul>
-    <p><a href="{{ url_for('cart') }}">View Cart</a></p>
-</body>
-</html>
+</ul>
+{% endblock %}
