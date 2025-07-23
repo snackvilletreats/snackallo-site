@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Checkout - Snackallo{% endblock %}
+{% block content %}
+<h2>Payment Initiated</h2>
+<p>Order ID: {{ order.id }}</p>
+<form>
+  <script
+    src="https://checkout.razorpay.com/v1/checkout.js"
+    data-key="YOUR_RAZORPAY_KEY_ID"
+    data-amount="{{ amount }}"
+    data-currency="INR"
+    data-order_id="{{ order.id }}"
+    data-buttontext="Pay with Razorpay"
+    data-name="Snackallo"
+    data-description="Snack Purchase"
+    data-theme.color="#F37254"
+  ></script>
+</form>
+{% endblock %}
