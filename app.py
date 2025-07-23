@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for, session
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
 
+# Dummy product data
 products = [
     {"id": 1, "name": "Banana Chips", "price": 100, "image": "banana-chips.jpg"},
     {"id": 2, "name": "Mixture", "price": 80, "image": "mixture.jpg"},
@@ -34,44 +35,56 @@ def cart():
     cart = session.get('cart', [])
     return render_template('cart.html', cart=cart)
 
-@app.route('/add-to-cart/<int:product_id>', methods=['POST'])
+@app.route('/add-to-cart/<int:product_id>')
 def add_to_cart(product_id):
-    quantity = int(request.form.get('quantity', 1))
     cart = session.get('cart', [])
+    found = False
+
     for item in cart:
         if item["id"] == product_id:
-            item["quantity"] += quantity
+            item["quantity"] += 1
+            found = True
             break
-    else:
+
+    if not found:
         product = next((p for p in products if p["id"] == product_id), None)
         if product:
-            cart.append({**product, "quantity": quantity})
+            cart.append({
+                "id": product["id"],
+                "name": product["name"],
+                "price": product["price"],
+                "quantity": 1
+            })
+
     session['cart'] = cart
     return redirect(url_for('cart'))
 
-@app.route('/update-quantity', methods=['POST'])
-def update_quantity():
-    product_id = int(request.form['id'])
-    action = request.form['action']
-    cart = session.get('cart', [])
-    for item in cart:
-        if item["id"] == product_id:
-            if action == "increase":
-                item["quantity"] += 1
-            elif action == "decrease":
-                item["quantity"] -= 1
-                if item["quantity"] <= 0:
-                    cart.remove(item)
-            break
-    session['cart'] = cart
-    return redirect(url_for('cart'))
+@app.route('/update-cart', methods=['POST'])
+def update_cart():
+    product_ids = request.form.getlist('product_ids')
+    quantities = request.form.getlist('quantities')
+    remove_ids = request.form.getlist('remove')
 
-@app.route('/remove-from-cart', methods=['POST'])
-def remove_from_cart():
-    product_id = int(request.form['id'])
-    cart = session.get('cart', [])
-    cart = [item for item in cart if item['id'] != product_id]
-    session['cart'] = cart
+    updated_cart = []
+
+    for i in range(len(product_ids)):
+        product_id = int(product_ids[i])
+        quantity = int(quantities[i])
+
+        if str(product_id) in remove_ids:
+            continue  # Skip this item if marked for removal
+
+        for product in products:
+            if product["id"] == product_id:
+                updated_cart.append({
+                    "id": product["id"],
+                    "name": product["name"],
+                    "price": product["price"],
+                    "quantity": quantity
+                })
+                break
+
+    session['cart'] = updated_cart
     return redirect(url_for('cart'))
 
 @app.route('/checkout', methods=['POST'])
