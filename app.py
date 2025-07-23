@@ -158,8 +158,8 @@ def about():
 def contact():
     content = """
     <h2>Contact Us</h2>
-    <p>Phone: +91-XXXXXXXXXX</p>
-    <p>Email: support@snackallo.com</p>
+    <p>Phone: +91-7736 944 344</p>
+    <p>Email: care@snackallo.com</p>
     <form>
       <input type='text' placeholder='Your Name'><br>
       <input type='email' placeholder='Your Email'><br>
